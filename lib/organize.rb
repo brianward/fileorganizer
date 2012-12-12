@@ -8,11 +8,17 @@ class Organize
 		# create tests
 		# what does "full documentation" mean?
 		# integrate with Travic CI 
-		@directory_path = '/Users/brianward/Sites/filetest/'
+		@directory_path = '/Users/brianward/Sites/fileorganizer/lib/testfiles/'
 	end
 
 	def directory_files
-		files_sorted_by_time = Dir["#{directory_path}**/*.*"].sort_by{ |f| File.ctime(f) }
+		files_sorted_by_time = Dir["#{directory_path}**/*.*"].sort_by{ |f| File.mtime(f) }
+	end
+
+	def show_new_names
+		directory_files.each do |filename|
+			puts directory_path + File.mtime(filename).to_s + filename[-4,4]
+		end
 	end
 
 	def rename_files
@@ -35,8 +41,16 @@ class Organize
 		directory_files.each do |filename|
 			folder_name = filename.split('/').last[0,10]
 			Dir.mkdir(directory_path + folder_name) unless Dir.exists?(directory_path + folder_name)
-			puts directory_path + folder_name
-			FileUtils.mv(filename, directory_path + folder_name)
+			FileUtils.copy_file(filename, directory_path + folder_name + "/" + filename.split('/').last, preserve = true)
+			FileUtils.remove_file(filename, force = true)
+		end
+	end
+
+	def delete_non_date_folders
+		Dir["#{directory_path}**/**"].each do |folder_name|
+			if !/\d{4}\-\d{2}\-\d{2}/.match(folder_name)
+				FileUtils.remove_dir(folder_name, force = false)
+			end
 		end
 	end
 	

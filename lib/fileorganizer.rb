@@ -12,10 +12,13 @@ puts newTask.directory_files
 newTask.directory_files.each do |filename|
 	puts filename
 end
+puts "Proposed file names:"
+newTask.show_new_names
 puts "Rename & move files? (y/n)"
 if gets.strip == 'y'
 	newTask.rename_files
 	newTask.move_files
+	newTask.delete_non_date_folders
 	newTask.directory_files.each do |filename|
 		puts filename
 	end
